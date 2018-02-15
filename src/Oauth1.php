@@ -84,11 +84,28 @@ class Oauth1
         return function ($request, array $options) use ($handler) {
 
             if (isset($options['auth']) && $options['auth'] == 'oauth') {
+                $config = $this->config;
+                $this->mergeOptions($options);
                 $request = $this->onBefore($request);
+                $this->config = $config;
             }
 
             return $handler($request, $options);
         };
+    }
+
+    /**
+     * Merges options into config.
+     *
+     * @param array $options
+     */
+    private function mergeOptions(array $options)
+    {
+        if (isset($options['oauth_options'])) {
+            foreach ($options['oauth_options'] as $optName => $optValue) {
+                $this->config[$optName] = $optValue;
+            }
+        }
     }
 
     private function onBefore(RequestInterface $request)
